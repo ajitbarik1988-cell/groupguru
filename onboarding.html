@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GroupGuru — Get Started</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wa-green:#25D366; --wa-dark:#075E54; --wa-mint:#DCF8C6; --wa-teal:#128C7E;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html,body{height:100%; margin:0;}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif; color:#fff;
+  background:linear-gradient(135deg,var(--wa-dark),var(--wa-teal));
+  display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;
+}
+@media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important;} }
+
+.bubble{ position:absolute; background:rgba(255,255,255,0.08); border-radius:16px; animation:drift 9s ease-in-out infinite; }
+@keyframes drift{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-24px);} }
+
+.card{
+  background:#fff; color:#0B141A; width:min(440px,90vw); border-radius:24px; padding:36px 30px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.3); position:relative; z-index:2;
+}
+.progress{ height:5px; background:#E9EDEF; border-radius:6px; overflow:hidden; margin-bottom:26px; }
+.progress-fill{ height:100%; background:var(--wa-green); border-radius:6px; transition:width .5s cubic-bezier(.4,0,.2,1); }
+
+.step{ display:none; text-align:center; animation:stepin .4s ease-out; }
+.step.active{ display:block; }
+@keyframes stepin{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+.step h2{ font-size:22px; margin:6px 0 8px; }
+.step p{ color:#667781; font-size:14px; line-height:1.5; margin:0 0 22px; }
+.emoji{ font-size:44px; margin-bottom:8px; }
+
+.qr{ width:150px; height:150px; margin:0 auto 18px; border-radius:16px; background:repeating-linear-gradient(45deg,#0B141A,#0B141A 6px,#fff 6px,#fff 12px); position:relative; }
+.check{ width:60px; height:60px; margin:0 auto 14px; }
+.check circle{ fill:none; stroke:var(--wa-green); stroke-width:5; stroke-dasharray:170; stroke-dashoffset:170; animation:draw .6s ease-out forwards .15s; }
+.check path{ fill:none; stroke:var(--wa-green); stroke-width:5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:40; stroke-dashoffset:40; animation:draw .3s ease-out forwards .7s; }
+@keyframes draw{ to{stroke-dashoffset:0;} }
+
+.optgrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px; }
+.opt{ border:2px solid #E9EDEF; border-radius:14px; padding:14px 8px; font-size:13px; font-weight:700; cursor:pointer; transition:border-color .15s, background .15s; }
+.opt:hover{ border-color:var(--wa-green); }
+.opt.sel{ border-color:var(--wa-green); background:var(--wa-mint); }
+
+.avatars{ display:flex; justify-content:center; margin-bottom:20px; }
+.av{ width:38px; height:38px; border-radius:50%; background:var(--wa-teal); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; margin-left:-10px; border:2px solid #fff; opacity:0; animation:popin .3s ease-out forwards; }
+@keyframes popin{ from{opacity:0; transform:scale(.5);} to{opacity:1; transform:scale(1);} }
+
+.btnrow{ display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+button{ font-family:inherit; border:none; cursor:pointer; }
+.btn-next{ background:var(--wa-green); color:#fff; padding:12px 26px; border-radius:30px; font-weight:700; font-size:14px; transition:transform .15s; }
+.btn-next:hover{ transform:scale(1.04); }
+.btn-back{ background:none; color:#667781; font-weight:600; font-size:13px; }
+.btn-back:disabled{ opacity:0; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<div class="bubble" style="width:70px;height:50px;top:8%;left:10%;"></div>
+<div class="bubble" style="width:50px;height:36px;top:70%;left:15%;animation-delay:2s;"></div>
+<div class="bubble" style="width:90px;height:60px;top:20%;right:8%;animation-delay:1s;"></div>
+<div class="bubble" style="width:60px;height:42px;bottom:10%;right:14%;animation-delay:3s;"></div>
+
+<div class="card">
+  <div class="progress"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+
+  <div class="step active" id="step1">
+    <div class="emoji">👋</div>
+    <h2>Aapka WhatsApp, AI ke saath</h2>
+    <p>GroupGuru replies, reminds and collects orders for you — so your groups run themselves.</p>
+    <div class="btnrow" style="justify-content:center;"><button class="btn-next" onclick="next()">Get Started →</button></div>
+  </div>
+
+  <div class="step" id="step2">
+    <div class="qr"></div>
+    <h2 id="s2title">Connect WhatsApp</h2>
+    <p id="s2text">Scan this QR from WhatsApp → Linked Devices to connect your business number.</p>
+    <div class="btnrow"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="scanNow()">Simulate Scan</button></div>
+  </div>
+
+  <div class="step" id="step3">
+    <div class="avatars" id="avatars"></div>
+    <h2>Add your first community</h2>
+    <p>Import contacts from a CSV or start a fresh group — we'll bring your members in.</p>
+    <div class="optgrid">
+      <div class="opt" onclick="pick(this)">Import Contacts</div>
+      <div class="opt" onclick="pick(this)">Create New Group</div>
+    </div>
+    <div class="btnrow"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Continue</button></div>
+  </div>
+
+  <div class="step" id="step4">
+    <div class="emoji">🧠</div>
+    <h2>Train your AI</h2>
+    <p>Pick a starting template so your AI knows how to talk to your members.</p>
+    <div class="optgrid">
+      <div class="opt" onclick="pick(this)">Tuition Centre</div>
+      <div class="opt" onclick="pick(this)">Salon</div>
+      <div class="opt" onclick="pick(this)">Gym</div>
+      <div class="opt" onclick="pick(this)">Restaurant</div>
+    </div>
+    <div class="btnrow"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="finish()">You're all set! ✓</button></div>
+  </div>
+
+  <div class="step" id="step5">
+    <div class="emoji">🎉</div>
+    <h2>You're all set!</h2>
+    <p>Your AI copilot is live. Head to your dashboard to see it in action.</p>
+    <a href="app.html" class="btn-next" style="display:inline-block; text-decoration:none;">Go to Dashboard →</a>
+  </div>
+</div>
+
+<script>
+let step = 1;
+function show(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  document.getElementById('progressFill').style.width = Math.min(n,4)*25+'%';
+  step = n;
+}
+function next(){ show(step+1); }
+function back(){ show(step-1); }
+function pick(el){ el.parentElement.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
+function scanNow(){
+  document.getElementById('s2title').textContent = 'Connected!';
+  document.getElementById('s2text').textContent = 'Your WhatsApp Business number is linked.';
+  document.querySelector('.qr').outerHTML = `<svg class="check" viewBox="0 0 60 60"><circle cx="30" cy="30" r="27"/><path d="M18 31 L26 39 L42 21"/></svg>`;
+  setTimeout(next, 900);
+}
+function finish(){
+  const names = ['P','R','A','V','S'];
+  const av = document.getElementById('avatars');
+  names.forEach((n,i)=>{
+    const d = document.createElement('div');
+    d.className='av'; d.textContent=n; d.style.animationDelay=(i*80)+'ms';
+    av.appendChild(d);
+  });
+  show(5);
+}
+</script>
+</body>
+</html>
