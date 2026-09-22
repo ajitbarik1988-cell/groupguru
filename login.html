@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GroupGuru — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wa-green:#25D366; --wa-dark:#075E54; --wa-mint:#DCF8C6; --wa-teal:#128C7E; --coral:#FF6B6B;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html,body{height:100%; margin:0;}
+body{
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif; color:#0B141A;
+  background:linear-gradient(135deg,var(--wa-dark),var(--wa-teal));
+  display:flex; align-items:center; justify-content:center;
+}
+.card{ background:#fff; width:min(380px,90vw); border-radius:24px; padding:34px 30px; box-shadow:0 24px 60px rgba(0,0,0,0.3); }
+.brand{ display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:22px; }
+.brand .dot{ width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--wa-green),var(--wa-teal)); display:flex; align-items:center; justify-content:center; font-size:18px; }
+.brand span{ font-weight:800; font-size:19px; }
+h1{ font-size:19px; text-align:center; margin:0 0 4px; }
+.sub{ text-align:center; color:#667781; font-size:13px; margin:0 0 22px; }
+label{ font-size:12px; font-weight:700; color:#667781; display:block; margin-bottom:5px; }
+input{ width:100%; padding:11px 13px; border:1px solid #E9EDEF; border-radius:12px; font-size:14px; font-family:inherit; margin-bottom:14px; }
+input:focus{ outline:2px solid var(--wa-green); outline-offset:1px; border-color:var(--wa-green); }
+button.primary{ width:100%; background:var(--wa-green); color:#fff; border:none; padding:12px; border-radius:26px; font-weight:700; font-size:14px; cursor:pointer; transition:transform .15s; }
+button.primary:hover{ transform:scale(1.02); }
+button.primary:disabled{ opacity:.6; cursor:default; transform:none; }
+.switch{ text-align:center; font-size:13px; color:#667781; margin-top:16px; }
+.switch a{ color:var(--wa-teal); font-weight:700; cursor:pointer; }
+.err{ background:#FFE0E0; color:#C0392B; font-size:12px; padding:9px 12px; border-radius:10px; margin-bottom:14px; display:none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand"><div class="dot">💬</div><span>GroupGuru</span></div>
+  <h1 id="formTitle">Welcome back</h1>
+  <p class="sub" id="formSub">Sign in to your dashboard</p>
+
+  <div class="err" id="errBox"></div>
+
+  <form id="authForm">
+    <label for="email">Email</label>
+    <input type="email" id="email" required autocomplete="email">
+    <label for="password">Password</label>
+    <input type="password" id="password" required autocomplete="current-password" minlength="6">
+    <button type="submit" class="primary" id="submitBtn">Sign in</button>
+  </form>
+
+  <p class="switch">
+    <span id="switchText">Don't have an account?</span>
+    <a id="switchLink">Sign up</a>
+  </p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCKk2YTSNog4E9SXb8j_EAL1wMDokZ2V4I",
+  authDomain: "groupguru-7de8c.firebaseapp.com",
+  projectId: "groupguru-7de8c",
+  storageBucket: "groupguru-7de8c.firebasestorage.app",
+  messagingSenderId: "1005845326176",
+  appId: "1:1005845326176:web:f2f06b339f4dad2311d605"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let mode = 'signin';
+const formTitle = document.getElementById('formTitle');
+const formSub = document.getElementById('formSub');
+const submitBtn = document.getElementById('submitBtn');
+const switchText = document.getElementById('switchText');
+const switchLink = document.getElementById('switchLink');
+const errBox = document.getElementById('errBox');
+
+switchLink.onclick = () => {
+  mode = mode === 'signin' ? 'signup' : 'signin';
+  const isSignup = mode === 'signup';
+  formTitle.textContent = isSignup ? 'Create your account' : 'Welcome back';
+  formSub.textContent = isSignup ? 'Set up your GroupGuru dashboard' : 'Sign in to your dashboard';
+  submitBtn.textContent = isSignup ? 'Create account' : 'Sign in';
+  switchText.textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
+  switchLink.textContent = isSignup ? 'Sign in' : 'Sign up';
+  errBox.style.display = 'none';
+};
+
+document.getElementById('authForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  errBox.style.display = 'none';
+  submitBtn.disabled = true;
+  submitBtn.textContent = mode === 'signup' ? 'Creating account…' : 'Signing in…';
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  try{
+    if(mode === 'signup'){
+      await createUserWithEmailAndPassword(auth, email, password);
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+    window.location.href = 'app.html';
+  }catch(err){
+    errBox.textContent = friendlyError(err.code);
+    errBox.style.display = 'block';
+    submitBtn.disabled = false;
+    submitBtn.textContent = mode === 'signup' ? 'Create account' : 'Sign in';
+  }
+});
+
+function friendlyError(code){
+  const map = {
+    'auth/email-already-in-use': 'That email is already registered — try signing in instead.',
+    'auth/invalid-email': 'Enter a valid email address.',
+    'auth/weak-password': 'Password should be at least 6 characters.',
+    'auth/user-not-found': 'No account found with that email.',
+    'auth/wrong-password': 'Incorrect password.',
+    'auth/invalid-credential': 'Incorrect email or password.'
+  };
+  return map[code] || 'Something went wrong — please try again.';
+}
+
+// If already signed in, skip straight to the app
+onAuthStateChanged(auth, (user)=>{
+  if(user) window.location.href = 'app.html';
+});
+</script>
+</body>
+</html>

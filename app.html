@@ -170,9 +170,11 @@ body{
     <div class="topbar-right">
       <div class="icon-btn" id="themeBtn">🌙</div>
       <div class="icon-btn">🔔</div>
-      <div class="avatar">RA</div>
+      <div class="avatar" id="userAvatar">··</div>
+      <div class="icon-btn" id="signOutBtn" title="Sign out">⎋</div>
     </div>
   </div>
+  <div id="authGate" style="position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:999; font-size:14px; color:var(--text2);">Loading your dashboard…</div>
 
   <div id="content">
 
@@ -296,7 +298,35 @@ body{
   <button class="fab" id="fabBtn">+ New Broadcast</button>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCKk2YTSNog4E9SXb8j_EAL1wMDokZ2V4I",
+  authDomain: "groupguru-7de8c.firebaseapp.com",
+  projectId: "groupguru-7de8c",
+  storageBucket: "groupguru-7de8c.firebasestorage.app",
+  messagingSenderId: "1005845326176",
+  appId: "1:1005845326176:web:f2f06b339f4dad2311d605"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+
+onAuthStateChanged(auth, (user) => {
+  if(!user){
+    window.location.href = 'login.html';
+    return;
+  }
+  document.getElementById('authGate').style.display = 'none';
+  const name = user.email.split('@')[0];
+  const avatarEl = document.getElementById('userAvatar');
+  avatarEl.textContent = name.slice(0,2).toUpperCase();
+  avatarEl.title = user.email;
+});
+
+document.getElementById('signOutBtn').onclick = () => signOut(auth).then(()=> window.location.href='login.html');
+
 // ---- theme ----
 const themeBtn = document.getElementById('themeBtn');
 themeBtn.onclick = () => {
